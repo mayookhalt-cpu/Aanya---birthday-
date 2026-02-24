@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Birthday Mission 🎉</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb);
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden
+      }
+
+      h1,
+      h2 {
+        color: #fff;
+        text-shadow: 2px 2px #ff4d6d
+      }
+
+      .stage {
+        margin-top: 30px
+      }
+
+      input {
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc
+      }
+
+      button {
+        padding: 10px 20px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 8px;
+        background: #ff4d6d;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 700
+      }
+
+      #basketArea,
+      #candyArea,
+      #gameArea {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: auto;
+        border-radius: 15px;
+        background: #fff3
+      }
+
+      .ball,
+      .basketball,
+      .candy {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        position: absolute;
+        cursor: pointer
+      }
+
+      .ball {
+        background: red
+      }
+
+      .basketball {
+        background: orange
+      }
+
+      .candy {
+        background: linear-gradient(45deg, #ff4d6d, #ffb347)
+      }
+
+      #points1,
+      #points2,
+      #points3 {
+        font-weight: 700;
+        color: #ff4d6d
+      }
+
+      #confettiCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="confettiCanvas"></canvas>
+    <audio id="birthdaySong" autoplay loop>
+      <source src="https://www.orangefreesounds.com/wp-content/uploads/2016/06/Happy-birthday-song.mp3" type="audio/mpeg">
+    </audio>
+    <div id="stage0" class="stage">
+      <h2>🎉 Welcome to Your Birthday Mission! 🎉</h2>
+      <p>Hey! You’re about to go on a fun little challenge 🎮🎈</p>
+      <p>There are <strong>3 mini-games</strong>and <strong>3 fun questions</strong>before you unlock the final surprise message 🥳💖 </p>
+      <ul style="text-align:left;display:inline-block">
+        <li>✅ Game 1: Click the moving red ball 5 times</li>
+        <li>✅ Game 2: Click candies to reach 1000 points</li>
+        <li>✅ Game 3: Score 5 baskets in basketball</li>
+        <li>✅ Answer 3 fun questions correctly</li>
+      </ul>
+      <button onclick="startGame()">Start Mission 🚀</button>
+    </div>
+    <div id="stage1" class="stage" style="display:none">
+      <p>Game 1: Click the red ball 5 times to pass!</p>
+      <div id="gameArea">
+        <div id="ball" class="ball" style="top:0;left:0"></div>
+      </div>
+      <p>Points: <span id="points1">0</span>/5 </p>
+    </div>
+    <div id="stage2" class="stage" style="display:none">
+      <p>Game 2: Click candies to get 1000 points!</p>
+      <div id="candyArea"></div>
+      <p>Points: <span id="points2">0</span>/1000 </p>
+    </div>
+    <div id="stage3" class="stage" style="display:none">
+      <p>Game 3: Score 5 baskets!</p>
+      <div id="basketArea">
+        <div id="basketball" class="basketball" style="top:130px;left:0"></div>
+      </div>
+      <p>Points: <span id="points3">0</span>/5 </p>
+    </div>
+    <div id="stage4" class="stage" style="display:none">
+      <p>Answer the fun questions!</p>
+      <p>1️⃣ The most amazing car?</p>
+      <input type="text" id="q1">
+      <br>
+      <p>2️⃣ Most amazing person?</p>
+      <input type="text" id="q2">
+      <br>
+      <p>3️⃣ Most shortest person in the world?</p>
+      <input type="text" id="q3">
+      <br>
+      <button onclick="checkQuestions()">Submit Answers</button>
+      <p id="qResult"></p>
+    </div>
+    <div id="stage5" class="stage" style="display:none">
+      <h2>🎂🎉 YOU DID IT! 🎉🎂</h2>
+      <p id="finalMsg">Happy birthday my dear Aanya! I know it’s your 13th birthday, which makes it even more special because you’ve just reached your teenage years. I hope this year is filled with the most beautiful and amazing memories, whether with your friends or family. I also hope you have a wonderful day today and in the days to come!</p>
+    </div>
+    <script>
+      function startGame() {
+        document.getElementById('stage0').style.display = 'none';
+        document.getElementById('stage1').style.display = 'block';
+        const song = document.getElementById('birthdaySong');
+        if (song.paused) {
+          song.play();
+        }
+      }
+      // Game 1
+      let points1 = 0;
+      const ball = document.getElementById('ball');
+      const pointsDisplay1 = document.getElementById('points1');
+      ball.onclick = () => {
+        points1++;
+        pointsDisplay1.textContent = points1;
+        ball.style.top = Math.random() * 250 + "px";
+        ball.style.left = Math.random() * 250 + "px";
+        if (points1 >= 5) {
+          document.getElementById('stage1').style.display = 'none';
+          startCandyGame();
+          document.getElementById('stage2').style.display = 'block';
+        }
+      };
+      // Game 2
+      let points2 = 0;
+      const candyArea = document.getElementById('candyArea');
+      const pointsDisplay2 = document.getElementById('points2');
+
+      function spawnCandy() {
+        const candy = document.createElement('div');
+        candy.className = 'candy';
+        candy.style.top = Math.random() * 250 + 'px';
+        candy.style.left = Math.random() * 250 + 'px';
+        candyArea.appendChild(candy);
+        candy.onclick = () => {
+          points2 += 50;
+          pointsDisplay2.textContent = points2;
+          candy.remove();
+          if (points2 >= 1000) {
+            document.getElementById('stage2').style.display = 'none';
+            document.getElementById('stage3').style.display = 'block';
+          } else {
+            spawnCandy();
+          }
+        }
+      }
+
+      function startCandyGame() {
+        for (let i = 0; i < 5; i++) spawnCandy();
+      }
+      // Game 3
+      let points3 = 0;
+      const basketball = document.getElementById('basketball');
+      const pointsDisplay3 = document.getElementById('points3');
+      let basketPos = 0,
+        dir = 2;
+
+      function moveBasketball() {
+        basketPos += dir;
+        if (basketPos > 250 || basketPos < 0) dir *= -1;
+        basketball.style.left = basketPos + 'px';
+        requestAnimationFrame(moveBasketball);
+      }
+      moveBasketball();
+      basketball.onclick = () => {
+        points3++;
+        pointsDisplay3.textContent = points3;
+        if (points3 >= 5) {
+          document.getElementById('stage3').style.display = 'none';
+          document.getElementById('stage4').style.display = 'block';
+        }
+      }
+      // Questions
+      function checkQuestions() {
+        const a1 = document.getElementById('q1').value.toLowerCase().trim();
+        const a2 = document.getElementById('q2').value.toLowerCase().trim();
+        const a3 = document.getElementById('q3').value.toLowerCase().trim();
+        if (a1 === "bmw" && a2 === "mayookh" && a3 === "aanya") {
+          document.getElementById('stage4').style.display = 'none';
+          document.getElementById('stage5').style.display = 'block';
+          document.body.insertAdjacentHTML('beforeend', ' < div style = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;background:url(https://i.ibb.co/3yX5S6H/confetti.gif) center/cover no-repeat;" > < /div>');
+          }
+          else {
+            document.getElementById('qResult').innerHTML = "Some answers are wrong! Try again 😅";
+          }
+        }
+        // Confetti
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const confettiCount = 100;
+        const confetti = [];
+        for (let i = 0; i < confettiCount; i++) {
+          confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 6 + 2,
+            d: Math.random() * 10 + 2,
+            color: `hsl(${Math.random()*360},100%,50%)`,
+            tilt: Math.random() * 10 - 5
+          });
+        }
+
+        function drawConfetti() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          confetti.forEach(c => {
+            ctx.beginPath();
+            ctx.fillStyle = c.color;
+            ctx.moveTo(c.x, c.y);
+            ctx.lineTo(c.x + c.tilt + 2, c.y + c.r);
+            ctx.lineTo(c.x + c.tilt - 2, c.y + c.r);
+            ctx.closePath();
+            ctx.fill();
+            c.y += c.d;
+            c.x += Math.sin(c.y / 10);
+            if (c.y > canvas.height) {
+              c.y = 0;
+              c.x = Math.random() * canvas.width;
+            }
+          });
+          requestAnimationFrame(drawConfetti);
+        }
+        drawConfetti();
+        window.addEventListener('resize', () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        });
+    </script>
+  </body>
+</html>
